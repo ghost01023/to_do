@@ -1,0 +1,43 @@
+.tip-tap-container {
+  font-family: "EB Garamond", Arial, sans-serif;
+}
+
+.tip-tap-container:last-child {
+}
+
+/* .tip-tap-container:last-child:active {
+  outline: none;
+} */
+
+.ProseMirror {
+  border: 1px solid white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.3rem;
+}
+
+.ProseMirror-focused {
+  outline: none;
+}
+
+.tip-tap-btn {
+  background-color: white;
+  color: black;
+  padding: 0.4rem;
+  border-radius: 0.3rem;
+}
+
+.tip-tap-btn:hover {
+  background-color: bisque;
+}
+
+.tip-tap-btn:active {
+  background-color: #fff4f4;
+}
+
+.style-btn-active {
+  background-color: bisque;
+}
+
+.style-btn.active:hover {
+  background-color: bisque;
+}

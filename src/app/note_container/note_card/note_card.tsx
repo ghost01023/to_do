@@ -72,21 +72,17 @@ const handleNoteCardClick = (event: React.MouseEvent<HTMLImageElement>) => {
 }
 
 interface NoteCardTypes {
-    imgLink: string
+    htmlContent: string
 }
 
-export const NoteCard = ({imgLink}: NoteCardTypes) => {
-  console.log(imgLink);
+export const NoteCard = ({htmlContent}: NoteCardTypes) => {
+  console.log(htmlContent);
     return(
     <div className={"note-card"} onClick={monitorMutation}>
         <p className={"note-status"}><span className="inline-flex items-baseline">
             </span>In Progress</p>
         <p className={"note-heading"}>Title of Note</p>
-        <p>Content of note</p>
-        <p>Content of note</p>
-        <p>Content of note</p>
-        <p>Content of note</p>
-        <p>Content of note</p>
+        {htmlContent}
         {/* <TaskCheckBox></TaskCheckBox> */}
     </div>
     )

@@ -12,14 +12,15 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #000000;
     --header-font: "EB Garamond";
   }
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  /* background: var(--background); */
+  background-image: url("https://assets.codepen.io/210284/flower-2.jpg");
   font-family: var(--header-font), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
@@ -61,6 +62,8 @@ body {
 
 h1 {
   font-size: 2.3rem;
+  font-weight: bold;
+  text-shadow: 3px 3px 2px 2px grey;
 }
 
 /* .img-card:active {

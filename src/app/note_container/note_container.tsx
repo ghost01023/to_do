@@ -1,65 +1,43 @@
 "use client";
 
 import { NoteCard } from "./note_card/note_card"
-const flowerImageLinks = [
-    "https://assets.codepen.io/210284/flower-1.jpg",
-    "https://assets.codepen.io/210284/flower-2.jpg",
-    "https://assets.codepen.io/210284/flower-3.jpg",
-    "https://assets.codepen.io/210284/flower-4.jpg",
-    "https://assets.codepen.io/210284/flower-5.jpg",
-    "https://assets.codepen.io/210284/flower-6.jpg",
-    "https://assets.codepen.io/210284/flower-7.jpg",
-    "https://assets.codepen.io/210284/flower-8.jpg",
-    "https://assets.codepen.io/210284/flower-10.jpg",
-    "https://assets.codepen.io/210284/flower-3.jpg",
-    "https://assets.codepen.io/210284/flower-4.jpg",
-    "https://assets.codepen.io/210284/flower-5.jpg",
-    "https://assets.codepen.io/210284/flower-6.jpg",
-    "https://assets.codepen.io/210284/flower-7.jpg",
-    "https://assets.codepen.io/210284/flower-8.jpg",
-]
+
+import { Note } from "../page";
 
 interface NoteContainerProps {
-  noteData: Array<object>
+  noteData: Note[],
+  setShowEditor: (elem: React.MouseEvent<HTMLDivElement>) => void,
+  setSyncNoteDiv: (elem: HTMLDivElement) => void
 }
 
-
-export default function NoteContainer({noteData}:NoteContainerProps) {
+export default function NoteContainer({noteData, setShowEditor, setSyncNoteDiv}:NoteContainerProps) {
   let frontRunnerMonth = 0;
   let frontRunnerYear = 0;
     return(
     <section className="note-container">
-      {/* <h1>Hello</h1> */}
       {
-        noteData.map((contentObject, ind) => {
-        const date = new Date(contentObject.dateCreated * 1000);
+        noteData.map((noteObject, ind) => {
+        const date = new Date(noteObject.dateCreated * 1000);
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
-        console.log("year is " + year + " and front runner year is " + frontRunnerYear);
-        if (year !== frontRunnerYear || month !== frontRunnerMonth) {
-          if (year !== frontRunnerYear) {
-          frontRunnerYear = year;
-          return(
-            <>
-            <p className={"text-red-400"}>New year</p>
-          <NoteCard htmlContent={contentObject.content} key={ind}></NoteCard>
-          </>
-          )
-        }
-        if (month !== frontRunnerMonth) {
-          frontRunnerMonth = month;
-          return(
-            <>
-            <p className={"text-blue-600"}>New Month</p>
-            <NoteCard htmlContent={contentObject.content} key={ind}></NoteCard>
-            </>
-          )
-        }}
-         else {
-        return (<NoteCard htmlContent={contentObject.content} key={ind}></NoteCard>);
-        }
-      })
+        let newYear = false;
+        let newMonth = false;
+
+      if (year !== frontRunnerYear) {
+        frontRunnerYear = year;
+        newYear = true;
       }
-    </section>
-    )
+      if (month !== frontRunnerMonth) {
+        frontRunnerMonth = month;
+        newMonth = true;
+      }
+        return (
+          (newYear && newMonth) ? <>
+          <p className="text-red-400">New Year {frontRunnerYear}</p>
+          <p className="text-blue-600">New Month {frontRunnerMonth}</p>
+          </> : newYear ? <p className="text-red-400">New Year {frontRunnerYear}</p> : newMonth ? <p className="text-blue-600">New Month {frontRunnerMonth}</p> : 
+          <NoteCard setShowEditor={setShowEditor} setSyncNoteDiv={setSyncNoteDiv} htmlContent={noteObject.content} key={ind}></NoteCard>
+        )})
+      }
+    </section>)
 }

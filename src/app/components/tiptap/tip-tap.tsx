@@ -15,19 +15,17 @@ import { Color } from '@tiptap/extension-color';
 import StarterKit from "@tiptap/starter-kit";
 import { FloatingMenu, EditorContent, EditorProvider, useCurrentEditor } from '@tiptap/react'
 import React from 'react'
-import Image from "next/image";
+// import { Dispatch } from 'react'
 
 // BUTTON ASSETS FOR THE NOTE-EDITOR
 import BoldIcon from "../buttons/bold";
 
-
-interface TipTapEditorProps {
-  preloadedText: string,
+interface MenuBarProps {
+  syncNoteDiv?: HTMLDivElement;
+  setShowEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
-
-const MenuBar = () => {
+const MenuBar = ({syncNoteDiv, setShowEditor}: MenuBarProps) => {
   const {editor} = useCurrentEditor();
 
 const undo = () => {
@@ -48,7 +46,18 @@ const extractContent = () => {
 const extractHTMLContent = () => {
   const content = editor?.getHTML();
   console.log(content);
+  return content;
 }
+
+const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
+  console.log("syncNote is currently");
+  console.log(syncNoteDiv?.innerHTML);
+  const content = extractHTMLContent();
+  if (content && syncNoteDiv) {
+  syncNoteDiv.innerHTML = content;
+  }
+}
+
 
   if (!editor) {
     return (
@@ -138,6 +147,22 @@ const extractHTMLContent = () => {
           >
             getHTML()
           </button>
+          <button
+          onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor})}
+          className="tip-tap-btn"
+          >
+            Sync
+          </button>
+          <button
+          onClick={() => {
+            if (syncNoteDiv) {
+              syncCurrentNote({syncNoteDiv, setShowEditor});
+            }
+            setShowEditor(false)
+          }}
+          >
+            Close
+          </button>
         </div>
       </div>
       <EditorContent editor={editor} />
@@ -146,9 +171,6 @@ const extractHTMLContent = () => {
 }
 
 const extensions = [
-      // StarterKit.configure({
-        
-      // }),
       Document, 
       Paragraph,
       Text, 
@@ -178,11 +200,15 @@ const extensions = [
     ];
 
 interface EditorProps {
-  content: string
+  content: string,
+  syncNoteDiv?: HTMLDivElement,
+  setShowEditor: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const TipTapEditor = ({content}: EditorProps) => {
+export const TipTapEditor = ({content, syncNoteDiv, setShowEditor}: EditorProps) => {
+  console.log("Tip tap editor is being rendered with the following text content:");
+  console.log(content);
   return(
-    <EditorProvider slotBefore={<MenuBar/>} extensions={extensions} content={content}></EditorProvider>
+    <EditorProvider slotBefore={<MenuBar syncNoteDiv={syncNoteDiv} setShowEditor={setShowEditor}/>} extensions={extensions} content={content}></EditorProvider>
   )
 }

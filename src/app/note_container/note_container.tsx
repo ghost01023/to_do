@@ -32,11 +32,21 @@ export default function NoteContainer({noteData, setShowEditor, setSyncNoteDiv}:
         newMonth = true;
       }
         return (
-          (newYear && newMonth) ? <div key={noteObject.id}>
-          <p key={noteObject.id + "year"} className="text-red-400">New Year {frontRunnerYear}</p>
-          <p key={noteObject.id + "month"} className="text-blue-600">New Month {frontRunnerMonth}</p>
-          </div> : newYear ? <p key={noteObject.id + "year"} className="text-red-400">New Year {frontRunnerYear}</p> : newMonth ? <p key={noteObject.id + "month"} className="text-blue-600">New Month {frontRunnerMonth}</p> : 
-          <NoteCard key={noteObject.id} setShowEditor={setShowEditor} setSyncNoteDiv={setSyncNoteDiv} htmlContent={noteObject.content} ></NoteCard>
+          (newYear && newMonth) ?
+              <div key={noteObject.id}>
+              <p key={noteObject.id + "year"} className="text-red-400">New Year {frontRunnerYear}</p>
+              <p key={noteObject.id + "month"} className="text-blue-600">New Month {frontRunnerMonth}</p>
+              </div> :
+              newYear ?
+                  <p key={noteObject.id + "year"} className="text-red-400">New Year {frontRunnerYear}</p> :
+                  newMonth ?
+                      <p key={noteObject.id + "month"} className="text-blue-600">New Month {frontRunnerMonth}</p> :
+              <NoteCard
+                  key={noteObject.id}
+                  setShowEditor={setShowEditor}
+                  setSyncNoteDiv={setSyncNoteDiv}
+                  htmlContent={noteObject.content}
+              ></NoteCard>
         )})
       }
     </section>)

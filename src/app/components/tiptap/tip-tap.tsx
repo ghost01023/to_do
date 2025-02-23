@@ -14,14 +14,16 @@ import TextStyle from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color';
 import StarterKit from "@tiptap/starter-kit";
 import { FloatingMenu, EditorContent, EditorProvider, useCurrentEditor } from '@tiptap/react'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 // import { Dispatch } from 'react'
 
 // BUTTON ASSETS FOR THE NOTE-EDITOR
 import BoldIcon from "../buttons/bold";
+import {Note} from "../../page";
+import Button from "@/app/components/buttons/italic";
 
 interface MenuBarProps {
-  syncNoteDiv?: HTMLDivElement;
+  syncNoteDiv?: HTMLDivElement | undefined;
   noteContent: string;
   setShowEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -72,7 +74,11 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
 
   return (
     <div className={"tip-tap-container"}>
-      {editor && <FloatingMenu className="floating-menu" tippyOptions={{ duration: 100 }} editor={editor}>
+      {editor &&
+          <FloatingMenu
+          className="floating-menu"
+          tippyOptions={{ duration: 100 }}
+          editor={editor}>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor.isActive('heading', { level: 1 }) ? 'style-btn-active tip-tap-btn mr-2' : 'tip-tap-btn mr-2'}
@@ -93,13 +99,8 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
         </button>
       </FloatingMenu>}
       <div className="control-group">
-        <div className="button-group flex flex-row gap-x-3 mb-3">
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive('italic') ? 'style-btn-active tip-tap-btn' : 'tip-tap-btn'}
-          >
-            Toggle italic
-          </button>
+        <div className="button-group flex flex-row flex-wrap gap-x-3 mb-3">
+
           <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'style-btn-active tip-tap-btn' : 'tip-tap-btn'}
@@ -107,6 +108,7 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
           
             <BoldIcon />
           </button>
+          <Button buttonType={"italic"} className={"tip-tap-btn"} editor={editor} clickEvent={() => editor.chain().focus().toggleItalic().run()} svgLink={"bold.svg"}></Button>
           <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive('bulletList') ? 'style-btn-active tip-tap-btn' : 'tip-tap-btn'}
@@ -120,12 +122,6 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
           >
             Undo
           </button>
-          <button
-          onClick={() => editor.chain().focus().setColor('#958DF1').run()}
-          className={editor.isActive('textStyle', { color: '#958DF1' }) ? 'style-btn-active tip-tap-btn' : 'tip-tap-btn'}
-        >
-          Purple
-        </button>
           <button
           onClick={redo}
           disabled={!editor?.can().redo()}
@@ -153,7 +149,7 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
           </button>
           <button
           onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor, noteContent})}
-          className="tip-tap-btn"
+          className="tip-tap-btn sync-btn"
           >
             Sync
           </button>
@@ -194,39 +190,89 @@ const extensions = [
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false
     },
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false
     },
   }),
     ];
 
 interface EditorProps {
   noteContent: string,
-  syncNoteDiv?: HTMLDivElement,
+  noteData: Note[],
+  setNoteData: React.Dispatch<React.SetStateAction<Note[]>>,
+  syncNoteDiv?: HTMLDivElement | undefined,
   setShowEditor: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface SyncViaKeyPressProps {
-  event: React.KeyboardEvent;
+  // event: React.KeyboardEvent;
   syncNoteDiv?: HTMLDivElement;
 }
 
-const syncViaKeyPress = ({event}: SyncViaKeyPressProps) => {
-  console.log(event);
-  console.log(event.target);
-  // if (event.ctrlKey && event.altKey && event.key=== "Enter") {
-  //   syncNoteDiv(event.target)
-  // }
+const syncViaKeyPress = ({syncNoteDiv}: SyncViaKeyPressProps) => {
+  console.log(syncNoteDiv);
+  if (document.querySelector(".sync-btn")) {
+    console.log("Button exists");
+  }
+  if (document.querySelector(".sync-btn")) {
+    document?.querySelector(".sync-btn")?.dispatchEvent(new Event('click'));
+  }
 }
 
-export const TipTapEditor = ({noteContent, syncNoteDiv, setShowEditor}: EditorProps) => {
+export const TipTapEditor = ({noteContent, noteData, setNoteData, syncNoteDiv, setShowEditor}: EditorProps) => {
+  // Handle new note creation
+  console.log(noteData);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.altKey && event.key === "Enter") {
+        console.log("Syncing...");
+        syncViaKeyPress({syncNoteDiv})
+      } else if(event.ctrlKey && event.altKey && event.key === "Backspace") {
+        console.log("Closing...");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+  const [hasAddedNote, setHasAddedNote] = useState(false);
+  useEffect(() => {
+    if (!syncNoteDiv && !hasAddedNote) {
+      setNoteData((prevNoteData: Note[]) => [
+        ...prevNoteData,
+        {
+          "id": Date.now(),
+          "dateCreated": Date.now(),
+          "dateModified": Date.now(),
+          "content": "New note"
+        }
+      ]);
+      setHasAddedNote(true);
+    }
+  }, [syncNoteDiv, hasAddedNote, setNoteData]);
   console.log("Tip tap editor is being rendered with the following text content:");
-  console.log(noteContent);
-  return(<div className={"tip-tap-editor-container fixed top-20 bg-red-200"} onKeyDown={(event) => syncViaKeyPress({event})}>
-    <EditorProvider slotBefore={<MenuBar syncNoteDiv={syncNoteDiv} noteContent={noteContent} setShowEditor={setShowEditor}/>} extensions={extensions} content={noteContent}></EditorProvider>
-    </div>
-  )
-}
+  if (!syncNoteDiv && !hasAddedNote) {
+    return <div>Creating new note...</div>;
+  }
+
+  return (
+      <div
+          className={"tip-tap-editor-container fixed top-20 bg-red-200"}
+      >
+        <EditorProvider
+
+            slotBefore={
+              <MenuBar
+                  syncNoteDiv={syncNoteDiv}
+                  noteContent={noteContent}
+                  setShowEditor={setShowEditor}
+              />
+            }
+            extensions={extensions}
+            content={noteContent}
+        />
+      </div>
+  );
+};

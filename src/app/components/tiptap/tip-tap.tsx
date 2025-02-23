@@ -22,10 +22,11 @@ import BoldIcon from "../buttons/bold";
 
 interface MenuBarProps {
   syncNoteDiv?: HTMLDivElement;
+  noteContent: string;
   setShowEditor: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MenuBar = ({syncNoteDiv, setShowEditor}: MenuBarProps) => {
+const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
   const {editor} = useCurrentEditor();
 
 const undo = () => {
@@ -51,10 +52,13 @@ const extractHTMLContent = () => {
 
 const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
   console.log("syncNote is currently");
+
   console.log(syncNoteDiv?.innerHTML);
   const content = extractHTMLContent();
   if (content && syncNoteDiv) {
   syncNoteDiv.innerHTML = content;
+  } else if (content && !syncNoteDiv) {
+    
   }
 }
 
@@ -71,19 +75,19 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
       {editor && <FloatingMenu className="floating-menu" tippyOptions={{ duration: 100 }} editor={editor}>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
+          className={editor.isActive('heading', { level: 1 }) ? 'style-btn-active tip-tap-btn mr-2' : 'tip-tap-btn mr-2'}
         >
           H1
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
+          className={editor.isActive('heading', { level: 2 }) ? 'style-btn-active tip-tap-btn mr-2' : 'tip-tap-btn mr-2'}
         >
           H2
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive('bulletList') ? 'is-active' : ''}
+          className={editor.isActive('bulletList') ? 'style-btn-active tip-tap-btn mr-2' : 'tip-tap-btn mr-2'}
         >
           Bullet list
         </button>
@@ -148,7 +152,7 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
             getHTML()
           </button>
           <button
-          onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor})}
+          onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor, noteContent})}
           className="tip-tap-btn"
           >
             Sync
@@ -156,7 +160,7 @@ const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
           <button
           onClick={() => {
             if (syncNoteDiv) {
-              syncCurrentNote({syncNoteDiv, setShowEditor});
+              syncCurrentNote({syncNoteDiv, setShowEditor, noteContent});
             }
             setShowEditor(false)
           }}
@@ -200,15 +204,29 @@ const extensions = [
     ];
 
 interface EditorProps {
-  content: string,
+  noteContent: string,
   syncNoteDiv?: HTMLDivElement,
   setShowEditor: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const TipTapEditor = ({content, syncNoteDiv, setShowEditor}: EditorProps) => {
+interface SyncViaKeyPressProps {
+  event: React.KeyboardEvent;
+  syncNoteDiv?: HTMLDivElement;
+}
+
+const syncViaKeyPress = ({event}: SyncViaKeyPressProps) => {
+  console.log(event);
+  console.log(event.target);
+  // if (event.ctrlKey && event.altKey && event.key=== "Enter") {
+  //   syncNoteDiv(event.target)
+  // }
+}
+
+export const TipTapEditor = ({noteContent, syncNoteDiv, setShowEditor}: EditorProps) => {
   console.log("Tip tap editor is being rendered with the following text content:");
-  console.log(content);
-  return(
-    <EditorProvider slotBefore={<MenuBar syncNoteDiv={syncNoteDiv} setShowEditor={setShowEditor}/>} extensions={extensions} content={content}></EditorProvider>
+  console.log(noteContent);
+  return(<div className={"tip-tap-editor-container fixed top-20 bg-red-200"} onKeyDown={(event) => syncViaKeyPress({event})}>
+    <EditorProvider slotBefore={<MenuBar syncNoteDiv={syncNoteDiv} noteContent={noteContent} setShowEditor={setShowEditor}/>} extensions={extensions} content={noteContent}></EditorProvider>
+    </div>
   )
 }

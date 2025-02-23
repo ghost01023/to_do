@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #fffaf2;
   --foreground: #171717;
 }
 
@@ -19,7 +19,7 @@
 
 body {
   color: var(--foreground);
-  /* background: var(--background); */
+  background: #fffaf2;
   background-image: url("https://assets.codepen.io/210284/flower-2.jpg");
   font-family: var(--header-font), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
@@ -30,34 +30,7 @@ body {
 .background {
   display: grid;
   place-items: center;
-  /* height: 90vh; */
   padding: 5vh 0 0 0;
-}
-
-/* .gallery {
-  display: flex;
-  flex-flow: wrap column;
-  height: 100vh; */
-/* flex-direction: column; */
-/* flex-wrap: wrap; */
-/* gap: 16px;
-  max-width: 1500px;
-} */
-
-.img-card {
-  position: relative;
-  left: 0px;
-  width: 350px;
-  border-radius: 1em;
-  height: 80vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  object-fit: cover;
-  transition: 0.3s ease-in-out;
-  flex: 0.25;
-  background: beige;
 }
 
 h1 {
@@ -66,42 +39,34 @@ h1 {
   text-shadow: 3px 3px 2px 2px grey;
 }
 
-/* .img-card:active {
-  flex: 2;
-  cursor: pointer;
-} */
-
-/* .img-card-active {
-  flex: 3;
-  cursor: pointer;
-} */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1.5fr 3fr;
+}
 
 .logged-in-section {
-  display: flex;
-  width: 100vw;
-  flex-flow: column nowrap;
-  align-items: center;
-  justify-content: center;
+  /* display: flex; */
+  /* width: 100vw; */
+  /* flex-flow: column nowrap; */
+  /* align-items: center; */
+  /* justify-content: center; */
 }
 
 .note-container {
-  width: 100vw;
+  min-width: 300px;
   height: fit-content;
   padding: 20px;
-  background-color: black;
   border-radius: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
-  /* grid-template-rows: repeat(auto-fit, minmax(auto-fit, 1fr)); */
   grid-auto-rows: auto;
   align-items: start;
   column-gap: 0.8rem;
   row-gap: 0.8rem;
-  /* grid-gap: 5px; */
 }
 
 .note-card {
-  background-color: grey;
+  /* background-color: #fffaf2; */
 }
 
 .note-clone {
@@ -118,17 +83,4 @@ h1 {
 .note-status {
   text-align: right;
   width: 100%;
-}
-
-.note-heading {
-  font-size: 1.5rem;
-  margin-bottom: 0.3rem;
-}
-
-.note-content {
-  font-weight: 300;
-  text-align: left;
-  padding: 0.3rem 0.5rem;
-  background: #14ff0087;
-  border-radius: 0.3rem;
 }

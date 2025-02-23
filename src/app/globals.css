@@ -41,7 +41,12 @@ h1 {
 
 .dashboard {
   display: grid;
-  grid-template-columns: 1.5fr 3fr;
+  grid-gap: 0.5rem;
+  grid-template-columns: 1fr 5fr 2.5fr;
+  grid-template-rows: 1fr 5fr 1fr;
+  grid-template-areas:
+"header header header"
+"sidebar main main";
 }
 
 .logged-in-section {
@@ -52,18 +57,17 @@ h1 {
   /* justify-content: center; */
 }
 
-.note-container {
-  min-width: 300px;
-  height: fit-content;
-  padding: 20px;
-  border-radius: 10px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
-  grid-auto-rows: auto;
-  align-items: start;
-  column-gap: 0.8rem;
-  row-gap: 0.8rem;
+.header {
+  grid-area: header;
 }
+
+/*.filter {*/
+/*  grid-area: sidebar;*/
+/*}*/
+
+/*.note-container {*/
+/*  grid-area: main;*/
+/*}*/
 
 .note-card {
   /* background-color: #fffaf2; */

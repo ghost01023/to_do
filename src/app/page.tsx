@@ -65,6 +65,15 @@ export default function Home() {
     setFilteredNoteData(sortedNoteData.filter((note) => note.dateCreated % 1 === 0));
   }, [sortedNoteData]);
 
+
+  useEffect(() => {
+    fetch("/api/stack")
+    .then(res => res.json())
+    .then(data => {
+      
+    })
+  }, []);
+
   const user = true;
   if (user) {
     return (

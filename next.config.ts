@@ -12,4 +12,10 @@ const nextConfig: NextConfig = {
   },
 };
 
+module.exports = {
+  env: {
+    JWT_PUBLIC_KEY: process.env.JWT_PUBLIC_KEY
+  }
+}
+
 export default nextConfig;

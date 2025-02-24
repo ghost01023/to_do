@@ -23,6 +23,7 @@ body {
   background-image: url("https://assets.codepen.io/210284/flower-2.jpg");
   font-family: var(--header-font), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  overflow-y:hidden;
 }
 
 /* CONTAINER FOR NOTES */
@@ -53,8 +54,8 @@ h1 {
 }
 
 .note-container {
-  min-width: 300px;
-  height: fit-content;
+  /*min-width: 300px;*/
+  background: aquamarine;
   padding: 20px;
   border-radius: 10px;
   display: grid;

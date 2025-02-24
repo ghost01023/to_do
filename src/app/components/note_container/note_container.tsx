@@ -1,12 +1,13 @@
 "use client";
 
-import { NoteCard } from "./note_card/note_card"
+import { NoteCard } from "@/app/components/note_card/note_card"
 
-import { Note } from "../page";
+import { Note } from "@/types/component_types";
+import React from "react";
 
 interface NoteContainerProps {
   noteData: Note[],
-  setShowEditor: (elem: React.MouseEvent<HTMLDivElement>) => void,
+  setShowEditor: (elem: React.MouseEvent<HTMLElement>) => void,
   setSyncNoteDiv: (elem: HTMLDivElement) => void
 }
 
@@ -14,7 +15,7 @@ export default function NoteContainer({noteData, setShowEditor, setSyncNoteDiv}:
   let frontRunnerMonth = 0;
   let frontRunnerYear = 0;
     return(
-    <section className="note-container">
+    <section className="flex-1 h-full bg-gray-300 bg-opacity-50 overflow-y-auto p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {
         noteData.map((noteObject) => {
         const date = new Date(noteObject.dateCreated * 1000);
@@ -45,6 +46,8 @@ export default function NoteContainer({noteData, setShowEditor, setSyncNoteDiv}:
                   key={noteObject.id}
                   setShowEditor={setShowEditor}
                   setSyncNoteDiv={setSyncNoteDiv}
+                  dateCreated={noteObject.dateCreated}
+                  dateModified={noteObject.dateModified}
                   htmlContent={noteObject.content}
               ></NoteCard>
         )})

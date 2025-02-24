@@ -39,11 +39,11 @@ export default function Login() {
 
             <LinkButton
                 text={"Log in"}
-                href={"/handler/login"}
+                href={"/handler/sign-in"}
             ></LinkButton>
             <LinkButton
                 text={"Sign up"}
-                href={"/handler/signup"}></LinkButton>
+                href={"/handler/sign-up"}></LinkButton>
             </div>
         </div>
     )

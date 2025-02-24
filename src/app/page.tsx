@@ -27,6 +27,7 @@ export default function Home() {
   const [syncNoteDiv, setSyncNoteDiv] = useState<HTMLDivElement>();
   const [newNoteButton, setNewNoteButton] = useState(!showEditor);
   const [createNewNote, setCreateNewNote] = useState(false);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const toggleEditor = (elem: React.MouseEvent<HTMLElement>) => {
     noteContent = elem?.currentTarget?.querySelector(".note-content")?.innerHTML || "";
     if (elem.currentTarget.tagName === "BUTTON" && elem.currentTarget.classList.contains("new-note-btn")) {
@@ -68,14 +69,29 @@ export default function Home() {
 
   useEffect(() => {
     fetch("/api/stack")
-    .then(res => res.json())
+    .then(res => {
+      if (!res) {
+        console.log("NO USER WAS NOT FOUND");
+      }
+      return res.json()
+    })
     .then(data => {
-      
+      console.log("USER IS ");
+      if (!data.user) {
+        if (loggedIn) {
+          setLoggedIn(false);
+        }
+      } else {
+        if (!loggedIn) {
+          setLoggedIn(true);
+        }
+      }
+      console.log(data);
     })
   }, []);
 
-  const user = true;
-  if (user) {
+  // const user = true;
+  if (!loggedIn) {
     return (
       <Login></Login>
     )

@@ -1,7 +1,7 @@
 "use client";
 // PREDEFINED
 import React, { useState, useEffect } from "react";
-import { useNeonAuth } from '@/hooks/useNeonAuth';
+
 // import { useUser } from '@auth0/nextjs-auth0/client';
 
 
@@ -12,7 +12,6 @@ import NewNoteButton from "./components/new_note_button/new_note_button";
 import FilterMenu from "./components/filter_menu/filter_menu";
 import Header from "./components/header/header";
 import Login from "./components/login/login";
-import {AddTodoForm} from "@/app/components/auth_check/auth_check";
 import {Note} from "@/types/component_types";
 
 
@@ -104,11 +103,10 @@ export default function Home() {
   // const {user} = useUser();
   // console.warn("user details are");
   // console.log(user)
-  const { isAuthenticated, isLoading, user } = useNeonAuth();
-  if (!isAuthenticated) {
+  const user = true;
+  if (!user) {
     return (
-      // <Login></Login>
-        <AddTodoForm></AddTodoForm>
+      <Login></Login>
     )
   }
   return (

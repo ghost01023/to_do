@@ -6,6 +6,8 @@ import React, { useState, useEffect } from "react";
 
 
 // USER DEFINED
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { TipTapEditor } from "./components/tiptap/tip-tap";
 import NoteContainer from "@/app/components/note_container/note_container";
 import NewNoteButton from "./components/new_note_button/new_note_button";
@@ -30,6 +32,7 @@ export default function Home() {
   const [syncNoteDiv, setSyncNoteDiv] = useState<HTMLDivElement>();
   const [newNoteButton, setNewNoteButton] = useState(!showEditor);
   const [createNewNote, setCreateNewNote] = useState(false);
+  const [user, setUser] = useState<boolean>(false);
   // const [loggedIn, setLoggedIn] = useState<boolean>(false);
   // console.debug("RENDERING HOME PAGE user STATE IS " + user);
   // useEffect(() => {
@@ -99,11 +102,25 @@ export default function Home() {
     setFilteredNoteData(sortedNoteData.filter((note) => note.dateCreated % 1 === 0));
   }, [sortedNoteData]);
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const session = await getServerSession(authOptions);
+      if (!session && !user) {
+        setUser(false);
+      } else if(session) {
+        setUser(true);
+      }
+    }
+    checkSession().then(r =>
+        {console.log(r)}
+    );
+  }, [])
+
   // IMPLEMENT AUTH-0 LOGIN, SIGNUP HERE
   // const {user} = useUser();
   // console.warn("user details are");
   // console.log(user)
-  const user = true;
+
   if (!user) {
     return (
       <Login></Login>

@@ -2,17 +2,12 @@
 // PREDEFINED
 import React, { useState, useEffect } from "react";
 
-// import { useUser } from '@auth0/nextjs-auth0/client';
-
-
 // USER DEFINED
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { TipTapEditor } from "./components/tiptap/tip-tap";
-import NoteContainer from "@/app/components/note_container/note_container";
+import NoteContainer from "@/app/note_container";
 import NewNoteButton from "./components/new_note_button/new_note_button";
 import FilterMenu from "./components/filter_menu/filter_menu";
-import Header from "./components/header/header";
+import {Header} from "@/app/header";
 import Login from "./components/login/login";
 import {Note} from "@/types/component_types";
 
@@ -32,39 +27,7 @@ export default function Home() {
   const [syncNoteDiv, setSyncNoteDiv] = useState<HTMLDivElement>();
   const [newNoteButton, setNewNoteButton] = useState(!showEditor);
   const [createNewNote, setCreateNewNote] = useState(false);
-  const [user, setUser] = useState<boolean>(false);
-  // const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  // console.debug("RENDERING HOME PAGE user STATE IS " + user);
-  // useEffect(() => {
-  //   console.debug("Will try to check for auth")
-  //   const checkAuth = async () => {
-  //     try {
-  //       const res = await fetch("/api/auth/status");
-  //       const data = await res.json();
-  //       if (data.status !== 200) {
-  //         console.log("NOT AUTHENTICATED! SEVEN HELLS!!");
-  //         setUser(false);
-  //       }
-  //       else {
-  //         console.log("User ID:", data.userId);
-  //         setUser(true);
-  //       }
-  //     }catch(e) {
-  //       console.log(e);
-  //       console.error("SOME ERROR IN GETTING");
-  //     }
-  //   };
-  //   checkAuth().then(r => {
-  //     console.warn(r);
-  //   });
-  // }, []);
-  // CLOSED WHEN A USER EITHER PRESSES [CLOSE] OR TYPES [CTRL+ALT+X] WHEN EDITOR IS OPEN
-
-
   const toggleEditor = (elem: React.MouseEvent<HTMLElement>) => {
-    //if editor is already open, close it
-    // also, extract heading, progress and textContent separately from target element
-    // if (typeof(elem) === "")
     noteContent = elem?.currentTarget?.querySelector(".note-content")?.innerHTML || "";
     if (elem.currentTarget.tagName === "BUTTON" && elem.currentTarget.classList.contains("new-note-btn")) {
       alert("Initializing empty note")
@@ -102,33 +65,15 @@ export default function Home() {
     setFilteredNoteData(sortedNoteData.filter((note) => note.dateCreated % 1 === 0));
   }, [sortedNoteData]);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const session = await getServerSession(authOptions);
-      if (!session && !user) {
-        setUser(false);
-      } else if(session) {
-        setUser(true);
-      }
-    }
-    checkSession().then(r =>
-        {console.log(r)}
-    );
-  }, [])
-
-  // IMPLEMENT AUTH-0 LOGIN, SIGNUP HERE
-  // const {user} = useUser();
-  // console.warn("user details are");
-  // console.log(user)
-
-  if (!user) {
+  const user = true;
+  if (user) {
     return (
       <Login></Login>
     )
   }
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col">
-      <Header username={"user"}></Header>
+      <Header></Header>
       <section className="flex flex-1 overflow-hidden">
         <FilterMenu></FilterMenu>
         {

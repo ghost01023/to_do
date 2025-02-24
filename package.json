@@ -1,18 +1,16 @@
 {
-  "name": "to_do",
+  "name": "my-neon-stack-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/core": "^0.34.2",
-    "@auth/pg-adapter": "^1.7.4",
-    "@neondatabase/serverless": "^0.10.4",
-    "@stackframe/stack": "^2.7.18",
+    "@neondatabase/serverless": "0.10.4",
+    "@stackframe/stack": "^2.4.8",
     "@tiptap/extension-color": "^2.11.5",
     "@tiptap/extension-placeholder": "^2.11.5",
     "@tiptap/extension-task-item": "^2.11.5",
@@ -20,26 +18,22 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
-    "cookie": "^1.0.2",
-    "jose": "^6.0.6",
-    "jsonwebtoken": "^9.0.2",
-    "lucide-react": "^0.475.0",
-    "next": "15.1.7",
-    "next-auth": "^4.24.11",
-    "pg": "^8.13.3",
+    "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.1.7",
+    "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

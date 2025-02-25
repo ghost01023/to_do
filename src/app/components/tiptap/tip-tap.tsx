@@ -15,6 +15,7 @@ import {Color} from '@tiptap/extension-color';
 import StarterKit from "@tiptap/starter-kit";
 import {FloatingMenu, EditorContent, EditorProvider, useCurrentEditor, Editor} from '@tiptap/react'
 import React, {useEffect, useState} from 'react'
+import "@/app/tip-tap.css";
 // import { Dispatch } from 'react'
 
 // BUTTON ASSETS FOR THE NOTE-EDITOR
@@ -24,16 +25,18 @@ import ItalicIcon from "@/app/components/buttons/italic_icon";
 import BulletListIcon from "@/app/components/buttons/bulletlist_icon";
 import {SyncIcon} from "@/app/components/buttons/sync_icon";
 
+
 interface MenuBarProps {
     syncNoteDiv?: HTMLDivElement | undefined;
     noteContent: string;
     setShowEditor: (elem: React.MouseEvent<HTMLElement>) => void;
-
+    noteData: Note[];
+    setNoteData: React.Dispatch<React.SetStateAction<Note[]>>;
 }
 
 let GlobalEditor: Editor | null = null;
 
-const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
+const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData}: MenuBarProps) => {
 
     const {editor} = useCurrentEditor();
     GlobalEditor = editor;
@@ -53,7 +56,28 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
         console.log(syncNoteDiv?.innerHTML);
         const content = extractHTMLContent();
         if (content && syncNoteDiv) {
-            syncNoteDiv.innerHTML = content;
+            //TRY TO UPDATE ON DATABASE
+
+            fetch("/api/update_note", {
+                method: "POST", // or PATCH
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: 12, note_content: content }),
+            }).then(res => res.json()).then(data => {
+                console.log("ATTEMPTED TO SYNC NOTE DATA...");
+                console.log(data);
+                if (data.note_content === content) {
+                    setSyncing(false);
+                    // syncNoteDiv.innerHTML = content;
+                    //update the noteData array
+                    const index = noteData.findIndex(note => note.id === data.id);
+                    setNoteData(prev =>
+                        prev.map((note, i) =>
+                            i === index ? { ...note, note_content: data.note_content } : note
+                        )
+                    );
+
+                }
+            });
         } else if (content && !syncNoteDiv) {
 
         }
@@ -107,7 +131,6 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
                 </FloatingMenu>}
             <div className="control-group">
                 <div className="button-group flex flex-row flex-wrap gap-x-3 mb-3">
-
                     <button
                         onClick={() => editor.chain().focus().toggleBold().run()}
                         className={editor.isActive('bold') ? 'style-btn-active tip-tap-btn' : 'tip-tap-btn'}
@@ -161,7 +184,7 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
                         getHTML()
                     </button>
                     <button
-                        onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor, noteContent})}
+                        onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData})}
                         className="tip-tap-btn sync-btn flex flex-row flex-nowrap gap-x-1 items-center"
                     >Sync
                         <SyncIcon
@@ -171,7 +194,7 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent}: MenuBarProps) => {
                     <button className={"bg-red-500 rounded px-1 text-white editor-close-btn"}
                         onClick={(elem: React.MouseEvent<HTMLButtonElement>) => {
                             if (syncNoteDiv) {
-                                syncCurrentNote({syncNoteDiv, setShowEditor, noteContent});
+                                syncCurrentNote({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData});
                             }
                             setShowEditor(elem)
                         }}
@@ -230,46 +253,23 @@ export const TipTapEditor = ({ noteContent, noteData, setNoteData, syncNoteDiv, 
 
 
     useEffect(() => {
-        if (!syncNoteDiv) return;
-        if (!GlobalEditor) return; // Ensure editor is available before attaching the listener
+        // Ensure editor is available before attaching the listener
 
         const handleKeyDown = (event: KeyboardEvent) => {
+            console.log("handling key down");
             if (event.ctrlKey && event.altKey && event.key === "Enter" && syncNoteDiv) {
                 console.log("Syncing...");
 
-                console.log("Editor Content:", GlobalEditor?.getHTML());
-                syncNoteDiv.innerHTML = GlobalEditor?.getHTML() || "";
             } else if (event.ctrlKey && event.altKey && event.key === "Backspace") {
                 console.log("Closing...");
                 setNewNoteButton(true);
-                syncNoteDiv.innerHTML = GlobalEditor?.getHTML() || "";
-
+                document.querySelector(".editor-close-btn")?.click();
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [syncNoteDiv]); // Depend on editor to ensure it's available before adding event listener
-
-    const [hasAddedNote, setHasAddedNote] = useState(false);
-    useEffect(() => {
-        if (!syncNoteDiv && !hasAddedNote) {
-            setNoteData((prevNoteData: Note[]) => [
-                ...prevNoteData,
-                {
-                    "id": Date.now(),
-                    "dateCreated": Date.now(),
-                    "dateModified": Date.now(),
-                    "content": "New note"
-                }
-            ]);
-            setHasAddedNote(true);
-        }
-    }, [syncNoteDiv, hasAddedNote, setNoteData]);
-
-    if (!syncNoteDiv && !hasAddedNote) {
-        return <div>Creating new note...</div>;
-    }
+    }, [setNewNoteButton, syncNoteDiv]); // Depend on editor to ensure it's available before adding event listener
 
     return (
         <div className={"tip-tap-editor-container fixed inset-0 flex items-start pt-[5%] justify-center bg-red-200 bg-opacity-40 z-50"}>
@@ -279,6 +279,8 @@ export const TipTapEditor = ({ noteContent, noteData, setNoteData, syncNoteDiv, 
                         syncNoteDiv={syncNoteDiv}
                         noteContent={noteContent}
                         setShowEditor={setShowEditor}
+                        noteData={noteData}
+                        setNoteData={setNoteData}
                     />
                 }
                 extensions={extensions}

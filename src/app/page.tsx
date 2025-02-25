@@ -1,7 +1,6 @@
 "use client";
 // PREDEFINED
 import React, {useEffect, useState} from "react";
-import prisma from "@/lib/prisma"
 
 // USER DEFINED
 import {TipTapEditor} from "./components/tiptap/tip-tap";
@@ -29,8 +28,10 @@ export default function Home() {
   const toggleEditor = (elem: React.MouseEvent<HTMLElement>) => {
     noteContent = elem?.currentTarget?.querySelector(".note-content")?.innerHTML || "";
     if (elem.currentTarget.tagName === "BUTTON" && elem.currentTarget.classList.contains("new-note-btn")) {
-      alert("Initializing empty note")
+      // alert("Initializing empty note")
       noteContent = "";
+      setShowEditor(true);
+      return;
     }
     if (!showEditor) {
       // MAKE NOTE-CONTAINER GREY
@@ -49,22 +50,24 @@ export default function Home() {
         .then(res => {
           if (!res) {
             console.log("NO USER WAS NOT FOUND");
-            setLoggedIn(false);
           }
           return res.json()
         })
         .then(data => {
           // console.log("USER IS ");
           if (!data.user) {
-            if (loggedIn) {
-              setLoggedIn(false);
-            }
+            console.log("not logged in");
           } else {
             console.log("WILL TRY TO FETCH ALL NOTES FOR USER");
             // console.log("TRYING TO FETCH ALL NOTES...");
             fetch("/api/all_notes").then(res => res.json()).then(data => {
               console.log(data);
-              setNoteData([...data])
+              setNoteData(data.map((task: Note) => {
+                console.log("Task is ");
+                task.date_created = new Date(task.date_created).getTime();
+                task.date_modified = new Date(task.date_modified).getTime();
+                return task;
+              }))
             });
             // fetch("/api/all_notes").then(res => res.json()).then(data => {
             //   console.error(data);
@@ -81,15 +84,15 @@ export default function Home() {
   // RUNS WHENEVER NOTE_DATA IS MODIFIED
   useEffect(() => {
     //SET SORT CONDITION HERE (data, percentage etc.)
-    console.warn("noteData was set and am now sorting...");
-    setSortedNoteData([...noteData].sort((a, b) => b.dateCreated - a.dateCreated));
+    console.log("noteData was set and am now sorting...");
+    setSortedNoteData([...noteData].sort((a, b) => b.date_created - a.date_created));
   }, [noteData]);
 
   // RUNS WHENEVER SORTED_NOTE_DATA IS RE-SORTED VIA DIFFERENT PARAMETERS
   useEffect(() => {
     //SET FILTRATION PARAMETER(s) HERE
     console.warn("sortedNoteData was set and am now filtering...");
-    setFilteredNoteData(sortedNoteData.filter((note) => note.dateCreated % 1 === 0));
+    setFilteredNoteData(sortedNoteData.filter((note) => note.date_created % 1 === 0));
   }, [sortedNoteData]);
 
 
@@ -140,7 +143,7 @@ export default function Home() {
             ></NewNoteButton>) : ""
       }
       <NoteContainer
-          noteData={filteredNoteData}
+          noteData={sortedNoteData}
           setSyncNoteDiv={setSyncNoteDiv}
           setShowEditor={toggleEditor}
       ></NoteContainer>

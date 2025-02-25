@@ -1,9 +1,10 @@
 "use client";
 // PREDEFINED
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
+import prisma from "@/lib/prisma"
 
 // USER DEFINED
-import { TipTapEditor } from "./components/tiptap/tip-tap";
+import {TipTapEditor} from "./components/tiptap/tip-tap";
 import NoteContainer from "@/app/note_container";
 import NewNoteButton from "./components/new_note_button/new_note_button";
 import FilterMenu from "./components/filter_menu/filter_menu";
@@ -14,11 +15,8 @@ import {Note} from "@/types/component_types";
 
 let noteContent = "";
 
-const nd = [{"id":1730559100,"dateCreated":1730559100,"dateModified":1730559115,"content":"Content for note with dateCreated = 1730559100"},{"id":1730644610,"dateCreated":1730644610,"dateModified":1730644625,"content":"Content for note with dateCreated = 1730644610"},{"id":1731993480,"dateCreated":1731993480,"dateModified":1731993495,"content":"Content for note with dateCreated = 1731993480"},{"id":1732635246,"dateCreated":1732635246,"dateModified":1732635261,"content":"Content for note with dateCreated = 1732635246"},{"id":1732876255,"dateCreated":1732876255,"dateModified":1732876270,"content":"Content for note with dateCreated = 1732876255"},{"id":1734017721,"dateCreated":1734017721,"dateModified":1734017736,"content":"Content for note with dateCreated = 1734017721"},{"id":1734525159,"dateCreated":1734525159,"dateModified":1734525174,"content":"Content for note with dateCreated = 1734525159"},{"id":1734891617,"dateCreated":1734891617,"dateModified":1734891632,"content":"Content for note with dateCreated = 1734891617"},{"id":1735041689,"dateCreated":1735041689,"dateModified":1735041704,"content":"Content for note with dateCreated = 1735041689"},{"id":1735641839,"dateCreated":1735641839,"dateModified":1735641854,"content":"Content for note with dateCreated = 1735641839"}];
-
 
 export default function Home() {
-  const getNoteData = () => nd;
   // const session = await auth0.getSession();
   const [noteData, setNoteData] = useState<Note[]>([]);
   const [sortedNoteData, setSortedNoteData] = useState<Note[]>([]);
@@ -46,11 +44,39 @@ export default function Home() {
   setNewNoteButton(!showEditor);
 }, [showEditor]);
 
-  // RUN ONLY ONCE WHEN FETCHING DATA
   useEffect(() => {
-    const fetchedData = getNoteData();
-    setNoteData(prev => (JSON.stringify(prev) === JSON.stringify(fetchedData) ? prev : [...fetchedData]));
-  }, []);
+    fetch("/api/stack")
+        .then(res => {
+          if (!res) {
+            console.log("NO USER WAS NOT FOUND");
+            setLoggedIn(false);
+          }
+          return res.json()
+        })
+        .then(data => {
+          // console.log("USER IS ");
+          if (!data.user) {
+            if (loggedIn) {
+              setLoggedIn(false);
+            }
+          } else {
+            console.log("WILL TRY TO FETCH ALL NOTES FOR USER");
+            // console.log("TRYING TO FETCH ALL NOTES...");
+            fetch("/api/all_notes").then(res => res.json()).then(data => {
+              console.log(data);
+              setNoteData([...data])
+            });
+            // fetch("/api/all_notes").then(res => res.json()).then(data => {
+            //   console.error(data);
+            // })
+            // if (!loggedIn) {
+            setLoggedIn(true);
+            // }
+          }
+          // console.log(data);
+        })
+  }, [loggedIn]);
+
 
   // RUNS WHENEVER NOTE_DATA IS MODIFIED
   useEffect(() => {
@@ -67,28 +93,7 @@ export default function Home() {
   }, [sortedNoteData]);
 
 
-  useEffect(() => {
-    fetch("/api/stack")
-    .then(res => {
-      if (!res) {
-        console.log("NO USER WAS NOT FOUND");
-      }
-      return res.json()
-    })
-    .then(data => {
-      console.log("USER IS ");
-      if (!data.user) {
-        if (loggedIn) {
-          setLoggedIn(false);
-        }
-      } else {
-        if (!loggedIn) {
-          setLoggedIn(true);
-        }
-      }
-      console.log(data);
-    })
-  }, []);
+
 
   // const user = true;
   if (!loggedIn) {

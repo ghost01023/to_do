@@ -5,7 +5,7 @@ import { stackServerApp } from "@/stack";
 export async function GET() {
   const user = await stackServerApp.getUser();
   console.log("TRYING TO GET USER");
-  console.log(user);
+  // console.log(user);
   const app = stackServerApp.urls;
   const userProfile = await getUserDetails(user?.id);
   const data = {

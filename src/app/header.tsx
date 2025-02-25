@@ -24,15 +24,15 @@ export function Header() {
   const [app, setApp] = useState<AppProps>();
   const [userProfile, setUserProfile] = useState<UserProfileProps>();
 
-  useEffect(() => {
-    fetch("/api/stack")
-    .then(res => res.json())
-    .then(data => {
-      setUser(data.user);
-      setApp(data.app);
-      setUserProfile(data.userProfile);
-    })
-  }, []);
+  // useEffect(() => {
+  //   fetch("/api/stack")
+  //   .then(res => res.json())
+  //   .then(data => {
+  //     setUser(data.user);
+  //     setApp(data.app);
+  //     setUserProfile(data.userProfile);
+  //   })
+  // }, []);
   
 
   // const user = await stackServerApp.getUser();

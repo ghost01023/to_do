@@ -1,0 +1,17 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tasks {
+  id            Int       @id @default(autoincrement())
+  username      String    @db.VarChar(30)
+  note_content  String
+  date_created  DateTime? @default(now()) @db.Timestamp(6)
+  date_modified DateTime? @default(now()) @db.Timestamp(6)
+}

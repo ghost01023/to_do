@@ -7,19 +7,20 @@ export async function POST(req: Request) {
     if (!user || !user.primaryEmail) return [];
     const body = await req.json(); // Parse request body
     const {id, note_content} = body;
-    // console.log("ON SERVER SIDE, UPDATED NOTE IS");
+    // console.log("ON SERVER SIDE, NEW TASK IS");
     // console.log(body);
-    if (!id || !note_content) {
+    if (id !== 0 || !note_content) {
         return new Response("Missing parameters", {status: 400});
     }
 
-    const updatedNote = await prisma.tasks.update({
-        where: {
-            id: id
-        },
-        data: {note_content: note_content}
-    });
-    // console.log(updatedNote);
+    // console.log("SERVER TRYING TO INSERT NEW TASK FOR USER");
 
-    return new Response(JSON.stringify(updatedNote), {status: 200});
+    const insertedNote = await prisma.tasks.create({
+        data: {
+            username: user.primaryEmail,
+            note_content: note_content,
+        },
+    });
+
+    return new Response(JSON.stringify(insertedNote), {status: 200});
 }

@@ -5,10 +5,10 @@ import {stackServerApp} from "@/stack";
 
 export async function getNotes() {
     const user = await stackServerApp.getUser(); // Directly fetch user from Stack Auth
-    console.log("TRYING TO FETCH NOTES FOR USER ");
+    // console.log("TRYING TO FETCH NOTES FOR USER ");
     // console.log(user);
     if (!user || !user.primaryEmail) return []; // User not logged in
-    console.log("user.primaryEmail is " + user.primaryEmail);
+    // console.log("user.primaryEmail is " + user.primaryEmail);
     return prisma.tasks.findMany({
             where: {
                 username: user.primaryEmail,

@@ -13,7 +13,7 @@ import PlaceHolder from '@tiptap/extension-placeholder';
 import TextStyle from '@tiptap/extension-text-style'
 import {Color} from '@tiptap/extension-color';
 import StarterKit from "@tiptap/starter-kit";
-import {FloatingMenu, EditorContent, EditorProvider, useCurrentEditor, Editor} from '@tiptap/react'
+import {FloatingMenu, EditorContent, EditorProvider, useCurrentEditor} from '@tiptap/react'
 import React, {useEffect, useState} from 'react'
 import "@/app/tip-tap.css";
 // import { Dispatch } from 'react'
@@ -34,12 +34,11 @@ interface MenuBarProps {
     setNoteData: React.Dispatch<React.SetStateAction<Note[]>>;
 }
 
-let GlobalEditor: Editor | null = null;
+
 
 const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData}: MenuBarProps) => {
 
     const {editor} = useCurrentEditor();
-    GlobalEditor = editor;
     const [syncing, setSyncing] = useState(false);
     const undo = () => {
         editor?.chain().focus().undo().run();
@@ -52,19 +51,25 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
 
     const syncCurrentNote = ({syncNoteDiv}: MenuBarProps) => {
         setSyncing(true);
-        console.log("syncNote has the following innerHTML");
-        console.log(syncNoteDiv?.innerHTML);
+        // console.log("syncNote has the following innerHTML");
+        // console.log(syncNoteDiv?.innerHTML);
         const content = extractHTMLContent();
         if (content && syncNoteDiv) {
+            //RUNS IF NOTE EXISTS, THEREFORE syncNoteDiv EXISTS
             //TRY TO UPDATE ON DATABASE
-
+            // console.log("id of the syncnote is ");
+            //
+            // console.log(syncNoteDiv?.id);
+            // console.log("request body will be");
+            // console.log(JSON.stringify({id: syncNoteDiv.id, note_content: content}));
+            const jsonObj = {id: parseInt(syncNoteDiv.id), note_content: content};
             fetch("/api/update_note", {
                 method: "POST", // or PATCH
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: 12, note_content: content }),
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(jsonObj),
             }).then(res => res.json()).then(data => {
-                console.log("ATTEMPTED TO SYNC NOTE DATA...");
-                console.log(data);
+                // console.log("ATTEMPTED TO SYNC NOTE DATA...");
+                // console.log(data);
                 if (data.note_content === content) {
                     setSyncing(false);
                     // syncNoteDiv.innerHTML = content;
@@ -72,14 +77,25 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
                     const index = noteData.findIndex(note => note.id === data.id);
                     setNoteData(prev =>
                         prev.map((note, i) =>
-                            i === index ? { ...note, note_content: data.note_content } : note
+                            i === index ? {...note, note_content: data.note_content} : note
                         )
                     );
 
                 }
             });
         } else if (content && !syncNoteDiv) {
-
+            console.log("WILL ATTEMPT TO CREATE NEW NOTE");
+            fetch("/api/create_note", {
+                method: "POST", // or PATCH
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({id: 0, note_content: content}),
+            }).then(res => res.json()).then(data => {
+                console.log("SUCCESSFULLY RAN CREATE_NOTE ROUTE...");
+                data.date_created = new Date(data.date_created).getTime();
+                data.date_modified = new Date(data.date_modified).getTime();
+                console.log(data);
+                setNoteData((prev) => [...prev, data]);
+            })
         }
     }
 
@@ -104,7 +120,7 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
     }
 
     return (
-        <div className={"tip-tap-container"}>
+        <div className={"tip-tap-container bg-gray-800 bg-opacity-80 p-7 rounded h-[70vh] overflow-y-scroll"}>
             {editor &&
                 <FloatingMenu
                     className="floating-menu"
@@ -129,7 +145,7 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
                         Bullet list
                     </button>
                 </FloatingMenu>}
-            <div className="control-group">
+            <div className="control-group top-2">
                 <div className="button-group flex flex-row flex-wrap gap-x-3 mb-3">
                     <button
                         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -184,7 +200,13 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
                         getHTML()
                     </button>
                     <button
-                        onClick={() => syncCurrentNote({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData})}
+                        onClick={() => syncCurrentNote({
+                            syncNoteDiv,
+                            setShowEditor,
+                            noteContent,
+                            noteData,
+                            setNoteData
+                        })}
                         className="tip-tap-btn sync-btn flex flex-row flex-nowrap gap-x-1 items-center"
                     >Sync
                         <SyncIcon
@@ -192,12 +214,11 @@ const MenuBar = ({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData
                         ></SyncIcon>
                     </button>
                     <button className={"bg-red-500 rounded px-1 text-white editor-close-btn"}
-                        onClick={(elem: React.MouseEvent<HTMLButtonElement>) => {
-                            if (syncNoteDiv) {
+                            onClick={(elem: React.MouseEvent<HTMLButtonElement>) => {
                                 syncCurrentNote({syncNoteDiv, setShowEditor, noteContent, noteData, setNoteData});
-                            }
-                            setShowEditor(elem)
-                        }}
+
+                                setShowEditor(elem)
+                            }}
                     >
                         Close
                     </button>
@@ -248,7 +269,14 @@ interface EditorProps {
     setNewNoteButton: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const TipTapEditor = ({ noteContent, noteData, setNoteData, syncNoteDiv, setShowEditor, setNewNoteButton }: EditorProps) => {
+export const TipTapEditor = ({
+                                 noteContent,
+                                 noteData,
+                                 setNoteData,
+                                 syncNoteDiv,
+                                 setShowEditor,
+                                 setNewNoteButton
+                             }: EditorProps) => {
     // console.log(noteData);
 
 
@@ -259,11 +287,12 @@ export const TipTapEditor = ({ noteContent, noteData, setNoteData, syncNoteDiv, 
             console.log("handling key down");
             if (event.ctrlKey && event.altKey && event.key === "Enter" && syncNoteDiv) {
                 console.log("Syncing...");
+                (document.querySelector(".editor-sync-btn") as HTMLElement)?.click();
 
             } else if (event.ctrlKey && event.altKey && event.key === "Backspace") {
                 console.log("Closing...");
                 setNewNoteButton(true);
-                document.querySelector(".editor-close-btn")?.click();
+                (document.querySelector(".editor-close-btn") as HTMLElement)?.click();
             }
         };
 
@@ -272,7 +301,8 @@ export const TipTapEditor = ({ noteContent, noteData, setNoteData, syncNoteDiv, 
     }, [setNewNoteButton, syncNoteDiv]); // Depend on editor to ensure it's available before adding event listener
 
     return (
-        <div className={"tip-tap-editor-container fixed inset-0 flex items-start pt-[5%] justify-center bg-red-200 bg-opacity-40 z-50"}>
+        <div
+            className={"tip-tap-editor-container fixed inset-0 flex items-start pt-[5%] justify-center bg-red-200 bg-opacity-40 z-50 text-amber-50"}>
             <EditorProvider
                 slotBefore={
                     <MenuBar

@@ -19,6 +19,7 @@ export default function NoteContainer({noteData, setShowEditor, setSyncNoteDiv}:
 
               <NoteCard
                   key={noteObject.id}
+                  id={noteObject.id}
                   setShowEditor={setShowEditor}
                   setSyncNoteDiv={setSyncNoteDiv}
                   dateCreated={noteObject.date_created}

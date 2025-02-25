@@ -32,6 +32,11 @@ export default function Home() {
       noteContent = "";
       setShowEditor(true);
       return;
+    } else if (elem.currentTarget.tagName=== "BUTTON" && elem.currentTarget.classList.contains("editor-close-btn")) {
+      // console.log("will close editor");
+      setShowEditor(false);
+      setCreateNewNote(false);
+      return;
     }
     if (!showEditor) {
       // MAKE NOTE-CONTAINER GREY
@@ -49,21 +54,21 @@ export default function Home() {
     fetch("/api/stack")
         .then(res => {
           if (!res) {
-            console.log("NO USER WAS NOT FOUND");
+            // console.log("NO USER WAS NOT FOUND");
           }
           return res.json()
         })
         .then(data => {
           // console.log("USER IS ");
           if (!data.user) {
-            console.log("not logged in");
+            // console.log("not logged in");
           } else {
-            console.log("WILL TRY TO FETCH ALL NOTES FOR USER");
+            // console.log("WILL TRY TO FETCH ALL NOTES FOR USER");
             // console.log("TRYING TO FETCH ALL NOTES...");
             fetch("/api/all_notes").then(res => res.json()).then(data => {
               console.log(data);
               setNoteData(data.map((task: Note) => {
-                console.log("Task is ");
+                // console.log("Task is ");
                 task.date_created = new Date(task.date_created).getTime();
                 task.date_modified = new Date(task.date_modified).getTime();
                 return task;
@@ -121,7 +126,7 @@ export default function Home() {
           ></TipTapEditor>) : ""
       }
       {
-        (showEditor && createNewNote) ?
+        (createNewNote) ?
             <TipTapEditor
               syncNoteDiv={undefined}
               noteData={noteData}
